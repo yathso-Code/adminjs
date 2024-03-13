@@ -5,7 +5,7 @@ import { UpdateUserProductDto } from './dto/update-user-product.dto';
 @Injectable()
 export class UserProductService {
   create(createUserProductDto: CreateUserProductDto) {
-    return 'This action adds a new userProduct';
+    return `This action adds a new userProduct=> ${createUserProductDto.price}`;
   }
 
   findAll() {

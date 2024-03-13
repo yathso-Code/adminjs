@@ -7,7 +7,7 @@ import { UpdateUserProductDto } from './dto/update-user-product.dto';
 export class UserProductController {
   constructor(private readonly userProductService: UserProductService) {}
 
-  @Post()
+  @Post('/create')
   create(@Body() createUserProductDto: CreateUserProductDto) {
     return this.userProductService.create(createUserProductDto);
   }

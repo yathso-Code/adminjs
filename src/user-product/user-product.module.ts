@@ -1,7 +1,7 @@
 import { Module , NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { UserProductService } from './user-product.service';
 import { UserProductController } from './user-product.controller';
-import { checkUserisExit } from './user-product.middleware';
+import { CheckUserIsExitMiddleware } from './user-product.middleware';
 
 
 @Module({
@@ -10,8 +10,6 @@ import { checkUserisExit } from './user-product.middleware';
 })
 export class UserProductModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(checkUserisExit)
-      .forRoutes('cats');
+    consumer.apply(CheckUserIsExitMiddleware).forRoutes('user-product')
   } 
 }
