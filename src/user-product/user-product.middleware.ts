@@ -9,24 +9,21 @@ import { Request, Response, NextFunction } from 'express';
 export class CheckUserIsExitMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     console.log('This is Middleware.=>', req.body);
-    
-
-    try {
-      let id = req.body.userid;
+    let id = req.body.userid;
     console.log("id=>", id);
-      const response = await fetch(`https://localhost:3000/user/get/${id}`, {
-              method: 'GET',
-              agent: new https.Agent({ rejectUnauthorized: false })
-      });
 
-      const result = await response.json();
-      console.log("RESULT => ", result);
-
-
-    } catch (error) {
-      console.error('Error fetching user:', error);
-    }
-
-    next();
+     
+    fetch(`http://localhost:3000/user/get/${id}`)
+    .then((result) => {
+      return result.json(); // Corrected method name to lowercase "json"
+    })
+    .then((data) => {
+      console.log("Response:", data);
+      next(); // Log the parsed JSON data
+    })
+    .catch((err) => {
+      console.log("Error:", err); // Log any errors that occurred
+    });
+  
   }
 }

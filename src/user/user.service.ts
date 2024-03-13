@@ -34,17 +34,17 @@
       }
     }
   // ====================================fetch single data====================================
-    async findOne(id: number): Promise<User | undefined> {
-      try {
-        const options: FindOneOptions<any> = {
-          where: { userid: id },
-        };
-        return await this.userRepository.findOne(options);
-      } catch (error) {
-        console.error('Error fetching user:', error);
-        return undefined;
-      }
+  async findOne(id: number): Promise<User | undefined | any> {
+    try {
+      const options: FindOneOptions<any> = {
+        where: { userid: id },
+      };
+      return await this.userRepository.findOne(options);
+      
+    } catch (error) {
+      return undefined;
     }
+  }
   // =======================================update profile======================================
     async update(id: number, updateUserDto: UpdateUserDto): Promise<User | undefined> {
       try {
