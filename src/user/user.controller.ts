@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { LoginUserDto } from './dto/login.user.dto';
 
 @Controller('user')
 export class UserController {
@@ -43,6 +44,11 @@ export class UserController {
   @Delete('/remove/add-to-card/:id/card-id/:cardID')
   removeAddToCard(@Param('id') id: string, @Param('cardID') cardID: string){
     return this.userService.removeAddToCard(+id, +cardID)
+  }
+  // ==============================login===============================================
+  @Get('/login')
+  logIn(@Body() LoginUserDto: LoginUserDto){
+      return this.userService.login(LoginUserDto)
   }
 
 }

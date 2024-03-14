@@ -5,6 +5,9 @@
   import { FindOneOptions } from 'typeorm';
   import { InjectRepository } from '@nestjs/typeorm';
   import { User } from './entities/user.entity';
+  import { LoginUserDto } from './dto/login.user.dto';
+import { promises } from 'dns';
+import { emit } from 'process';
 
   @Injectable()
   export class UserService {
@@ -123,6 +126,18 @@
       return `Failed to remove from cart, ${error}`;
     }
   }
+  // =========================login==========================================
+
+  async login(LoginUserDto: LoginUserDto): Promise<User | undefined> {
+    const { email, password } = LoginUserDto;
+    
+    const findOneOptions: FindOneOptions<User> = {
+      where: { email, password } // Include both email and password conditions
+    };
+  
+    return await this.userRepository.findOne(findOneOptions);
+  }
+  
   
 
   }
