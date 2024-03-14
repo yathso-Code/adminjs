@@ -1,4 +1,4 @@
-  import { Injectable } from '@nestjs/common';
+  import { BadRequestException, Injectable } from '@nestjs/common';
   import { CreateUserDto } from './dto/create-user.dto';
   import { UpdateUserDto } from './dto/update-user.dto';
   import { Repository } from 'typeorm';
@@ -18,22 +18,31 @@ import { emit } from 'process';
     ) {}
 
   //  ===========create user=============================================================
-    async create(createUserDto: CreateUserDto): Promise<User | undefined> {
-      try {
-        let user: User = this.userRepository.create(createUserDto);
-        return await this.userRepository.save(user);
-      } catch (error) {
-        console.error('Error creating user:', error);
-        return undefined;
-      }
+    async create(createUserDto: CreateUserDto): Promise<User | undefined | any> {
+        try {
+             let {email} = createUserDto;
+            // Check if a user with the provided email already exists
+            const findOneOptions: FindOneOptions<User> = {
+              where: { email } // Include both email and password conditions
+            };
+            const existingUser = await this.userRepository.findOne(findOneOptions);
+            if (existingUser) {
+                return new BadRequestException("user is alredy exit") // Return undefined to indicate that the user creation failed
+            }
+
+            // If user does not exist, create a new user entity and save it
+            const newUser: User = this.userRepository.create(createUserDto);
+            return await this.userRepository.save(newUser);
+        } catch (error) {
+            return new BadRequestException(error.message);
+        }
     }
   // =========================find all data===============================================
-    async findAll(): Promise<User[]> {
+    async findAll(): Promise<User[]| any[] | any> {
       try {
         return await this.userRepository.find();
       } catch (error) {
-        console.error('Error fetching users:', error);
-        return [];
+        return new BadRequestException(error.message) ;
       }
     }
   // ====================================fetch single data====================================
@@ -42,18 +51,21 @@ import { emit } from 'process';
       const options: FindOneOptions<any> = {
         where: { userid: id },
       };
-      return await this.userRepository.findOne(options);
-      
+      let x:any = await this.userRepository.findOne(options);
+      if(!x){
+         return new BadRequestException("user is not prasent")
+      }
+      return x;
     } catch (error) {
-      return undefined;
+      return new BadRequestException(error.message);
     }
   }
   // =======================================update profile======================================
-    async update(id: number, updateUserDto: UpdateUserDto): Promise<User | undefined> {
+    async update(id: number, updateUserDto: UpdateUserDto): Promise<User | undefined | any> {
       try {
         let user: User = await this.findOne(id);
         if (!user) {
-          return undefined;
+          return new BadRequestException("user is not prasent");
         }
         user.name = updateUserDto.name;
         user.age = updateUserDto.age;
@@ -62,11 +74,11 @@ import { emit } from 'process';
         return await this.userRepository.save(user);
       } catch (error) {
         console.error('Error updating user:', error);
-        return undefined;
+        return new BadRequestException(error.message);
       }
     }
   // =======================================remove=========================================
-    async remove(id: number): Promise<string> {
+    async remove(id: number): Promise<string | any > {
       try {
         const result = await this.userRepository.delete({ userid: id });
         if (result.affected === 0) {
@@ -75,11 +87,11 @@ import { emit } from 'process';
         return 'User deleted successfully';
       } catch (error) {
         console.error('Error deleting user:', error);
-        return 'Failed to delete user';
+        return new BadRequestException(error.message);
       }
     }
     // ===============================add to card===================================
-    async addToCard(id: number, cardID: number): Promise<string> {
+    async addToCard(id: number, cardID: number): Promise<string | any> {
       try {
         let user: User = await this.findOne(id);
         if (!user) {
@@ -102,11 +114,11 @@ import { emit } from 'process';
     
       } catch (error) {
         console.error('Error adding to cart:', error);
-        return `Failed to add to cart, ${error}`;
+        return new BadRequestException(error.message);
       }
     }    
    // ======================================remove add to card =============================================
-   async removeAddToCard(id: number, cardID: number): Promise<string> {
+   async removeAddToCard(id: number, cardID: number): Promise<string | any> {
     try {
       let user: User = await this.findOne(id);
       if (!user) return "User does not exist";
@@ -123,7 +135,7 @@ import { emit } from 'process';
       return "Item removed from the card successfully";
     } catch (error) {
       console.error('Error removing from cart:', error);
-      return `Failed to remove from cart, ${error}`;
+      return new BadRequestException(error.message);
     }
   }
   // =========================login==========================================

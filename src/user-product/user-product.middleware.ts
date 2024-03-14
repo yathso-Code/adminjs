@@ -18,8 +18,12 @@ export class CheckUserIsExitMiddleware implements NestMiddleware {
       return result.json(); // Corrected method name to lowercase "json"
     })
     .then((data) => {
-      console.log("Response:", data);
+      console.log("Response:", data.status);
+      if(data.status >= 400){
+        console.log("user is not alaluble")
+      }else{
       next(); // Log the parsed JSON data
+      }
     })
     .catch((err) => {
       console.log("Error:", err); // Log any errors that occurred
